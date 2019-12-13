@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "koa-body": "^4.1.1",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^7.4.0",
+    "koa-static": "^5.0.0",
+    "sqlite3": "^4.1.1"
+  }
+}
