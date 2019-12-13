@@ -10,14 +10,16 @@ var sqlite3 = require('sqlite3').verbose();
  
 var DB = DB || {};
  
-DB.SqliteDB = function(file){
-    DB.db = new sqlite3.Database(file);
- 
-    DB.exist = fs.existsSync(file);
-    if(!DB.exist){
+DB.SqliteDB = function(file, callback){
+    this.exist = fs.existsSync(file);
+    if(!this.exist){
         console.log("Creating db file!");
-        fs.openSync(file, 'w');
+        // fs.openSync(file, 'w');
     };
+
+    this.db = new sqlite3.Database(file);
+
+    callback && callback.call(this, this.exist)
 };
  
 DB.printErrorInfo = function(err){
@@ -25,8 +27,8 @@ DB.printErrorInfo = function(err){
 };
  
 DB.SqliteDB.prototype.createTable = function(sql){
-    DB.db.serialize(function(){
-        DB.db.run(sql, function(err){
+    this.db.serialize(()=>{
+        this.db.run(sql, function(err){
             if(null != err){
                 DB.printErrorInfo(err);
                 return;
@@ -37,8 +39,8 @@ DB.SqliteDB.prototype.createTable = function(sql){
  
 /// tilesData format; [[level, column, row, content], [level, column, row, content]]
 DB.SqliteDB.prototype.insertData = function(sql, objects){
-    DB.db.serialize(function(){
-        var stmt = DB.db.prepare(sql);
+    this.db.serialize(()=>{
+        var stmt = this.db.prepare(sql);
         for(var i = 0; i < objects.length; ++i){
             stmt.run(objects[i]);
         }
@@ -48,7 +50,7 @@ DB.SqliteDB.prototype.insertData = function(sql, objects){
 };
  
 DB.SqliteDB.prototype.queryData = function(sql, callback){
-    DB.db.all(sql, function(err, rows){
+    this.db.all(sql, function(err, rows){
         if(null != err){
             DB.printErrorInfo(err);
             return;
@@ -62,7 +64,7 @@ DB.SqliteDB.prototype.queryData = function(sql, callback){
 };
  
 DB.SqliteDB.prototype.executeSql = function(sql){
-    DB.db.run(sql, function(err){
+    this.db.run(sql, function(err){
         if(null != err){
             DB.printErrorInfo(err);
         }
@@ -70,7 +72,7 @@ DB.SqliteDB.prototype.executeSql = function(sql){
 };
  
 DB.SqliteDB.prototype.close = function(){
-    DB.db.close();
+    this.db.close();
 };
  
 /// export SqliteDB.

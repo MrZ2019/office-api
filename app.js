@@ -42,7 +42,28 @@ var SqliteDB = require('./sqlite3.js').SqliteDB;
  
 var file = "office.db";
  
-var sqliteDB = new SqliteDB(file);
+var sqliteDB = new SqliteDB(file, function(exist) {
+	var db = this
+	if (!exist) {
+
+		db.createTable(`CREATE TABLE photo (
+			id       INTEGER      PRIMARY KEY AUTOINCREMENT,
+			album_id INTEGER      NOT NULL,
+			file     VARCHAR (64) NOT NULL
+		);
+		`)
+
+		db.createTable(`CREATE TABLE album (
+			id       INTEGER      PRIMARY KEY AUTOINCREMENT,
+			name     VARCHAR (64) NOT NULL
+								  UNIQUE,
+			cover_id INTEGER
+		);
+		`)
+	}
+});
+
+
 
 function addHost(rows) {
 	for (let index = 0; index < rows.length; index++) {
