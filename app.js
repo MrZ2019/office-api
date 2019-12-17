@@ -163,6 +163,20 @@ router.post('/album/create', async (ctx, next)=> {
 	ctx.body = await createAlbum(body.name)
 })
 
+async function editAlbum(id, name) {
+	return new Promise((resolve, reject)=> {
+		let sql = "UPDATE album SET name=? WHERE ID=?"
+	
+		sqliteDB.insertData(sql, [[name, id]])
+
+		resolve('success')
+	})
+}
+router.post('/album/edit', async (ctx, next)=> {
+	let body = ctx.request.body
+	ctx.body = await editAlbum(body.id, body.name)
+})
+
 async function removePhoto(id) {
 	return new Promise((resolve, reject)=> {
 		let sql = "DELETE FROM photo WHERE id=?"
@@ -190,6 +204,29 @@ async function removeAlbum(id) {
 router.post('/album/remove', async (ctx, next)=> {
 	let body = ctx.request.body
 	ctx.body = await removeAlbum(body.albumId)
+})
+
+
+async function setConfig(newConfig) {
+	return new Promise((resolve, reject)=> {
+
+		let config = require('./config/default.json')
+
+		Object.assign(config, newConfig)
+
+		fs.writeFileSync('./config/default.json', JSON.stringify(config))
+
+		resolve('success')
+	})
+}
+router.post('/setconfig', async (ctx, next)=> {
+	let body = ctx.request.body
+	ctx.body = await setConfig(body)
+})
+
+router.get('/getconfig', async (ctx, next)=> {
+	ctx.type = 'application/json'
+	ctx.body = fs.readFileSync('./config/default.json')
 })
 app.use(router.routes())
 app.use(serve(pathPublic))
