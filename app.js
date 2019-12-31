@@ -206,6 +206,42 @@ router.post('/album/remove', async (ctx, next)=> {
 	ctx.body = await removeAlbum(body.albumId)
 })
 
+/** Blog */
+async function getArtical(id) {
+
+	return new Promise((resolve, reject)=> {
+
+		let sql = `SELECT * FROM blog_artical`
+	
+		sqliteDB.queryData(sql, (rows)=> {
+			resolve(JSON.stringify(rows))
+		})
+	})
+
+}
+
+ 
+router.get('/blog/list', async(ctx)=> {
+	ctx.type = 'application/json'
+	ctx.body = await getArtical()
+})
+
+
+async function createArtical(title, content, createTime) {
+	return new Promise((resolve, reject)=> {
+		let sql = "INSERT INTO blog_artical (title, content, create_time) VALUES(?, ?, ?)"
+	
+		sqliteDB.insertData(sql, [[title, content, createTime]])
+
+		resolve('success')
+	})
+}
+
+router.post('/blog/create', async (ctx, next)=> {
+	let body = ctx.request.body
+	ctx.body = await createArtical(body.title, body.content, body.createTime)
+})
+
 
 async function setConfig(newConfig) {
 	return new Promise((resolve, reject)=> {
