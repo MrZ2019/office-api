@@ -242,6 +242,34 @@ router.post('/blog/create', async (ctx, next)=> {
 	ctx.body = await createArtical(body.title, body.content, body.createTime)
 })
 
+async function removeArtical(id) {
+	return new Promise((resolve, reject)=> {
+		let sql = "DELETE FROM blog_artical WHERE id=?"
+	
+		sqliteDB.insertData(sql, [[id]])
+
+		resolve('success')
+	})
+}
+router.post('/blog/remove', async (ctx, next)=> {
+	let body = ctx.request.body
+	ctx.body = await removeArtical(body.articalId)
+})
+
+async function updateArtical(id, title, content, modifyTime) {
+	return new Promise((resolve, reject)=> {
+		let sql = "UPDATE blog_artical SET title=?, content=?, modify_time=? WHERE ID=?"
+	
+		sqliteDB.insertData(sql, [[title, content, modifyTime, id]])
+
+		resolve('success')
+	})
+}
+router.post('/blog/update', async (ctx, next)=> {
+	let body = ctx.request.body
+	ctx.body = await updateArtical(body.id, body.title, body.content, body.modifyTime)
+})
+
 
 async function setConfig(newConfig) {
 	return new Promise((resolve, reject)=> {
